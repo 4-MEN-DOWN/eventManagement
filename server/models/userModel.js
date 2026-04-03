@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 export const subscriptionTypes = {
   BASIC: "basic",
@@ -185,7 +185,7 @@ const ticketSchema = new mongoose.Schema(
     },
     organizerComment: String,
   },
-  { _id: true }
+  { _id: true },
 );
 
 // Subscription Statistics Schema
@@ -315,7 +315,7 @@ const userSchema = new mongoose.Schema(
       totalRevenue: { type: Number, default: 0 },
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // 🧠 Subscription methods
@@ -361,14 +361,14 @@ userSchema.methods.canCreateEvent = function (isPaidEvent = false) {
 // 🎫 Ticket methods
 userSchema.methods.getTicketForEvent = function (eventId) {
   return this.eventsToAttend.find(
-    (ticket) => ticket.event.toString() === eventId.toString()
+    (ticket) => ticket.event.toString() === eventId.toString(),
   );
 };
 
 userSchema.methods.updateTicketPaymentStatus = function (
   eventId,
   status,
-  transactionId = null
+  transactionId = null,
 ) {
   const ticket = this.getTicketForEvent(eventId);
   if (ticket) {
@@ -387,7 +387,7 @@ userSchema.methods.addSubscriptionPurchase = function (
   plan,
   transactionId,
   amount,
-  durationMonths = 1
+  durationMonths = 1,
 ) {
   const expiryDate = new Date();
   expiryDate.setMonth(expiryDate.getMonth() + durationMonths);
@@ -405,7 +405,7 @@ userSchema.methods.addSubscriptionPurchase = function (
 
 userSchema.methods.cancelSubscriptionStat = function (transactionId) {
   const subscriptionStat = this.subscriptionStats.find(
-    (stat) => stat.transactionId === transactionId && stat.status === "active"
+    (stat) => stat.transactionId === transactionId && stat.status === "active",
   );
 
   if (subscriptionStat) {
@@ -430,7 +430,7 @@ userSchema.methods.getTotalRevenue = function () {
 // Static methods for admin analytics
 userSchema.statics.getSubscriptionAnalytics = async function () {
   const users = await this.find({}).select(
-    "subscriptionStats name email subscription subscriptionStatus"
+    "subscriptionStats name email subscription subscriptionStatus",
   );
 
   const analytics = {
@@ -503,7 +503,7 @@ userSchema.statics.getSubscriptionAnalytics = async function () {
 
   // Sort recent subscriptions by date
   analytics.recentSubscriptions.sort(
-    (a, b) => new Date(b.purchaseDate) - new Date(a.purchaseDate)
+    (a, b) => new Date(b.purchaseDate) - new Date(a.purchaseDate),
   );
 
   return analytics;
@@ -533,7 +533,7 @@ userSchema.methods.generateToken = function () {
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_EXPIRE || "3d",
-    }
+    },
   );
 };
 
@@ -572,7 +572,7 @@ userSchema.methods.updateOrganizerStats = async function () {
     // Calculate revenue
     totalRevenue += event.attendees.reduce(
       (sum, attendee) => sum + (attendee.finalPrice || 0),
-      0
+      0,
     );
 
     // Calculate ratings
@@ -580,7 +580,7 @@ userSchema.methods.updateOrganizerStats = async function () {
       totalRatings += event.organizerRatings.length;
       ratingSum += event.organizerRatings.reduce(
         (sum, rating) => sum + rating.rating,
-        0
+        0,
       );
     }
   }

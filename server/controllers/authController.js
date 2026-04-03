@@ -1,6 +1,6 @@
 import ErrorHandler from "../middlewares/errorMiddleware.js";
 import { User } from "../models/userModel.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendVerificationCode } from "../utils/sendVerificationCode.js";
 import { sendToken } from "../utils/sendToken.js";
@@ -34,8 +34,8 @@ export const register = catchAsyncError(async (req, res, next) => {
     return next(
       new ErrorHandler(
         "Username already taken. Please choose another one.",
-        400
-      )
+        400,
+      ),
     );
   }
 
@@ -47,7 +47,7 @@ export const register = catchAsyncError(async (req, res, next) => {
 
   if (registrationAttemptsByUser.length > 0) {
     return next(
-      new ErrorHandler("You have exceeded registration attempts", 400)
+      new ErrorHandler("You have exceeded registration attempts", 400),
     );
   }
 
@@ -97,8 +97,8 @@ export const verfiyOtp = catchAsyncError(async (req, res, next) => {
     return next(
       new ErrorHandler(
         "Invalid OTP . Please check your email and enter the correct OTP number",
-        400
-      )
+        400,
+      ),
     );
   }
 
@@ -121,7 +121,7 @@ export const login = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler("Please enter email and password", 400));
 
   const user = await User.findOne({ email, accountVerified: true }).select(
-    "+password"
+    "+password",
   );
   if (!user) return next(new ErrorHandler("User not found", 400));
 
