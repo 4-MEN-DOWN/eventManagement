@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const BASE_URL = "https://eventmanagement-4-49d3.onrender.com";
+
 // ✅ Async thunk to create a new ad
 export const createAd = createAsyncThunk(
   "ads/createAd",
@@ -14,12 +16,12 @@ export const createAd = createAsyncThunk(
       });
 
       const response = await axios.post(
-        "http://localhost:5000/api/v1/ads/create",
+        `${BASE_URL}/api/v1/ads/create`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
           withCredentials: true,
-        }
+        },
       );
 
       console.log("Ad created successfully:", response.data);
@@ -27,11 +29,11 @@ export const createAd = createAsyncThunk(
     } catch (error) {
       console.error(
         "Error creating ad:",
-        error.response?.data || error.message
+        error.response?.data || error.message,
       );
       return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
+  },
 );
 
 // ✅ Async thunk to track ad view
@@ -39,16 +41,13 @@ export const trackAdView = createAsyncThunk(
   "ads/trackAdView",
   async (adId, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `http://localhost:5000/api/v1/ads/${adId}/view`
-      );
+      const response = await axios.post(`${BASE_URL}/api/v1/ads/${adId}/view`);
       return { adId, views: response.data.views };
     } catch (error) {
       console.error("Error tracking ad view:", error);
-      // Don't reject the promise - we don't want view tracking failures to break the UI
       return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
+  },
 );
 
 // ✅ Async thunk to track ad click
@@ -56,14 +55,13 @@ export const trackAdClick = createAsyncThunk(
   "ads/trackAdClick",
   async (adId, { rejectWithValue }) => {
     try {
-      // This will redirect the user, so we just need to open the tracking URL
-      window.open(`http://localhost:5000/api/v1/ads/${adId}/click`, "_blank");
+      window.open(`${BASE_URL}/api/v1/ads/${adId}/click`, "_blank");
       return { adId };
     } catch (error) {
       console.error("Error tracking ad click:", error);
       return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
+  },
 );
 
 // ✅ Async thunk to get ad analytics
@@ -72,14 +70,14 @@ export const getAdAnalytics = createAsyncThunk(
   async (adId, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/ads/${adId}/analytics`,
-        { withCredentials: true }
+        `${BASE_URL}/api/v1/ads/${adId}/analytics`,
+        { withCredentials: true },
       );
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
+  },
 );
 
 // ✅ Async thunk to verify payment and create ad
@@ -88,17 +86,15 @@ export const verifyPaymentAndCreateAd = createAsyncThunk(
   async (paymentData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/v1/ads/verify-payment",
+        `${BASE_URL}/api/v1/ads/verify-payment`,
         paymentData,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true },
       );
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
+  },
 );
 
 // ✅ Async thunk to fetch approved ads
@@ -106,12 +102,12 @@ export const fetchAds = createAsyncThunk(
   "ads/fetchAds",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("http://localhost:5000/api/v1/ads/");
+      const response = await axios.get(`${BASE_URL}/api/v1/ads/`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
+  },
 );
 
 // ✅ Async thunk to get user's ads
@@ -119,15 +115,14 @@ export const getUserAds = createAsyncThunk(
   "ads/getUserAds",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        "http://localhost:5000/api/v1/ads/my-ads",
-        { withCredentials: true }
-      );
+      const response = await axios.get(`${BASE_URL}/api/v1/ads/my-ads`, {
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
+  },
 );
 
 // ✅ Async thunk to get all ads (admin)
@@ -135,14 +130,14 @@ export const getAllAdsAdmin = createAsyncThunk(
   "ads/getAllAdsAdmin",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("http://localhost:5000/api/v1/ads/all", {
+      const response = await axios.get(`${BASE_URL}/api/v1/ads/all`, {
         withCredentials: true,
       });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
+  },
 );
 
 // ✅ Async thunk to update ad status
@@ -151,15 +146,15 @@ export const updateAdStatus = createAsyncThunk(
   async ({ id, status }, { rejectWithValue }) => {
     try {
       const response = await axios.patch(
-        `http://localhost:5000/api/v1/ads/${id}/status`,
+        `${BASE_URL}/api/v1/ads/${id}/status`,
         { status },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
+  },
 );
 
 // ✅ Async thunk to delete ad
@@ -167,15 +162,17 @@ export const deleteAd = createAsyncThunk(
   "ads/deleteAd",
   async (id, { rejectWithValue }) => {
     try {
-      await axios.delete(`http://localhost:5000/api/v1/ads/${id}`, {
+      await axios.delete(`${BASE_URL}/api/v1/ads/${id}`, {
         withCredentials: true,
       });
       return id;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
-  }
+  },
 );
+
+// ... rest of your slice (initialState, reducers, extraReducers) remains unchanged
 
 const adSlice = createSlice({
   name: "ads",
@@ -344,13 +341,13 @@ const adSlice = createSlice({
     builder.addCase(updateAdStatus.fulfilled, (state, action) => {
       state.updating = false;
       const index = state.allAds.findIndex(
-        (ad) => ad._id === action.payload._id
+        (ad) => ad._id === action.payload._id,
       );
       if (index !== -1) {
         state.allAds[index] = action.payload;
       }
       const publicIndex = state.ads.findIndex(
-        (ad) => ad._id === action.payload._id
+        (ad) => ad._id === action.payload._id,
       );
       if (action.payload.status === "approved" && publicIndex === -1) {
         state.ads.push(action.payload);

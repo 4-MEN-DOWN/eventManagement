@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
 // Base API URL
-const API_URL = "http://localhost:5000/api/messages";
+const API_URL = "https://eventmanagement-4-49d3.onrender.com/api/messages";
 
 // Async thunks for message operations
 export const fetchMessages = createAsyncThunk(
@@ -23,7 +23,7 @@ export const fetchMessages = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 export const sendMessage = createAsyncThunk(
@@ -51,7 +51,7 @@ export const sendMessage = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 export const markMessagesAsRead = createAsyncThunk(
@@ -65,7 +65,7 @@ export const markMessagesAsRead = createAsyncThunk(
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -76,7 +76,7 @@ export const markMessagesAsRead = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 export const getUnreadCount = createAsyncThunk(
@@ -97,7 +97,7 @@ export const getUnreadCount = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 // Get all messages for the current user
@@ -119,7 +119,7 @@ export const getAllUserMessages = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 export const syncMessagesFromServer = createAsyncThunk(
@@ -127,7 +127,7 @@ export const syncMessagesFromServer = createAsyncThunk(
   async (_, { rejectWithValue, dispatch }) => {
     try {
       // Get all messages for the user
-      const response = await fetch("/api/messages/user", {
+      const response = await fetch(`${API_URL}/user`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -161,16 +161,16 @@ export const syncMessagesFromServer = createAsyncThunk(
         hydrateMessages({
           conversations,
           unreadCount: messages.filter(
-            (m) => m.receiver === user._id && !m.isRead
+            (m) => m.receiver === user._id && !m.isRead,
           ).length,
-        })
+        }),
       );
 
       return { success: true };
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 // Initial state
 const initialState = {
@@ -211,7 +211,7 @@ const messageSlice = createSlice({
 
       // Check if message already exists to avoid duplicates
       const messageExists = state.conversations[conversationKey].some(
-        (msg) => msg._id === action.payload._id
+        (msg) => msg._id === action.payload._id,
       );
 
       if (!messageExists) {
@@ -219,7 +219,7 @@ const messageSlice = createSlice({
 
         // Sort messages by timestamp
         state.conversations[conversationKey].sort(
-          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
         );
       }
 
@@ -268,7 +268,7 @@ const messageSlice = createSlice({
 
         // Check if message already exists to avoid duplicates
         const messageExists = conversations[conversationKey].some(
-          (msg) => msg._id === message._id
+          (msg) => msg._id === message._id,
         );
 
         if (!messageExists) {
@@ -284,7 +284,7 @@ const messageSlice = createSlice({
       // Sort each conversation's messages by timestamp
       Object.keys(conversations).forEach((key) => {
         conversations[key].sort(
-          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
         );
       });
 
@@ -354,9 +354,9 @@ const messageSlice = createSlice({
               messages.filter(
                 (m) =>
                   !m.isRead &&
-                  m.receiver === JSON.parse(localStorage.getItem("user"))?._id
+                  m.receiver === JSON.parse(localStorage.getItem("user"))?._id,
               ).length,
-            0
+            0,
           );
         }
       })
@@ -396,7 +396,7 @@ const messageSlice = createSlice({
         // Sort each conversation's messages by timestamp
         Object.keys(conversations).forEach((key) => {
           conversations[key].sort(
-            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+            (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
           );
         });
 
