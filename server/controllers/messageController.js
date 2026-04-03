@@ -1,4 +1,4 @@
-import Message from "../models/message.js";
+import Message from "../models/Message.js";
 
 // @desc Get all messages for a conversation
 // @route GET /api/messages/:eventId/:organizerId
@@ -40,7 +40,7 @@ export const sendMessage = async (req, res) => {
     const savedMessage = await message.save();
     const populatedMessage = await Message.findById(savedMessage._id).populate(
       "sender",
-      "name email"
+      "name email",
     );
 
     // Emit socket event for real-time messaging
@@ -66,7 +66,7 @@ export const markMessagesAsRead = async (req, res) => {
         receiver: req.user.id,
         isRead: false,
       },
-      { $set: { isRead: true } }
+      { $set: { isRead: true } },
     );
 
     res.json({ message: "Messages marked as read" });
