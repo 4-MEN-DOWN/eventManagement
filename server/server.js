@@ -24,11 +24,15 @@ const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "http://localhost:5175",
+      "https://eventmanagement-5-3al5.onrender.com", // 👈 your deployed frontend
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   },
-  // Optional: Good for production
   pingTimeout: 60000,
   pingInterval: 25000,
 });
